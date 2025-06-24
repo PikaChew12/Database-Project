@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="app.js"></script>
+    <title>Alpine JS</title>
+    <style>
+        html{
+            font-size: 0.85rem;
+            font-family: 'Segoe UI';
+        }
+        td{
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        table,
+        th,
+        tr,
+        td {
+            border-collapse: collapse;
+            border: 1px solid #d3d3d3
+        }
+        textarea{
+            font-family: Arial;
+        }
+        a {
+            color: blue;
+        }
+
+        .col {
+            display: inline-block;
+            vertical-align: top;
+            margin-left: 10px;
+        }
+        .hdr th{
+            text-align: right;
+            padding-right: 5px;
+        }
+    </style>
+</head>
+
+<body x-data="App()" x-init="getCourses(); getKpis()">
+
+    <div class="col" x-show="Object.keys(kpis).length > 0 && page === 1">
+        <h2>Course Dashboard</h2>
+        <button @click="openAddStudent()">Add a Student</button>
+        <button @click="openRemoveStudent()">Remove a Student</button>
+        <table class="hdr">
+            <tr>
+                <th>Total Courses:</th>
+                <td x-text="kpis.total_courses"></td>
+            </tr>
+            <tr>
+                <th>Total Departments:</th>
+                <td x-text="kpis.total_departments"></td>
+            </tr>
+            <tr>
+                <th>Average Credits:</th>
+                <td x-text="kpis.average_credits"></td>
+            </tr>
+            <tr>
+                <th>Most Enrolled Course:</th>
+                <td x-text="kpis.top_courses_by_enrollment[0]?.course_id + ' (' + kpis.top_courses_by_enrollment[0]?.student_count + ' students)'"></td>
+            </tr>
+            <tr>
+                <th>Top Department (by Budget):</th>
+                <td x-text="kpis.top_departments_by_budget[0]?.dept_name + ' ($' + kpis.top_departments_by_budget[0]?.budget + ')'" ></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="col" x-show="courses.length !== 0 && page === 1">
+        <h2>Courses</h2>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Dept. Name</th>
+                <th>Credits</th>
+            </tr>
+            <template x-for="crs in courses">
+                <tr>
+                    <td x-text="crs.course_id"></td>
+                    <td>
+                        <a href="#" x-text="crs.title" @click="Edit(`${crs.course_id}`)"></a>
+                    </td>
+                    <td>
+                        <a href="#" x-text="crs.dept_name" @click="getStudentsByDept(`${crs.dept_name}`)"></a>
+                    </td>
+                    <td x-text="crs.credits"></td>
+                </tr>
+            </template>
+        </table>
+        <!-- <pre x-text="JSON.stringify(courses, null, 4)"></pre> -->
+    </div>
+    <div class="col" x-show="Object.keys(dept).length !== 0 && page === 1">
+        <h2>Departments</h2>
+        <table class="hdr">
+            <tr>
+                <th>Name : </th>
+                <td x-text="dept.dept_name"></td>
+            </tr>
+            <tr>
+                <th>Building : </th>
+                <td x-text="dept.building"></td>
+            </tr>
+            <tr>
+                <th>Budget : </th>
+                <td x-text="dept.budget"></td>
+            </tr>
+
+        </table>
+        <pre x-text="JSON.stringify(dept, null, 4)"></pre>
+    </div>
+    <div x-show="page === 2">
+        <h2>Edit</h2>
+        <table class="hdr">
+            <tr>
+                <th>Id : </th>
+                <td>
+                    <input type="text" x-model="course.course_id" size="3"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Title : </th>
+                <td>
+                    <textarea x-model="course.title"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>Name : </th>
+                <td>
+                    <!-- <input type="text" x-model="course.dept_name"/> -->
+                    <select x-model="course.dept_name">
+                        <template x-for="dpt in depts">
+                            <option 
+                                x-text="dpt.dept_name"
+                                :selected="dpt.dept_name === course.dept_name"
+                            ></option>
+                        </template>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Credits : </th>
+                <td>
+                    <input type="text" x-model="course.credits" size="2"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button @click="Save()">Save</button>
+                </td>
+            </tr>
+        </table>
+        <pre x-text="JSON.stringify(course, null, 4)"></pre>
+    </div>
+    <div x-show="page === 3">
+    <h2>Students Enrolled in Department</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Total Credits</th>
+            </tr>
+            <template x-for="s in students">
+                <tr>
+                    <td x-text="s.id"></td>
+                    <td x-text="s.name"></td>
+                    <td x-text="s.tot_cred"></td>
+                </tr>
+            </template>
+        </table>
+        <button @click="page = 1">Back</button>
+    </div>
+    <div x-show="page === 4">
+        <h2>Add a New Student</h2>
+        <table class="hdr">
+            <tr>
+                <th>ID:</th>
+                <td><input type="text" x-model="newStudent.id" /></td>
+            </tr>
+            <tr>
+                <th>Name:</th>
+                <td><input type="text" x-model="newStudent.name" /></td>
+            </tr>
+            <tr>
+                <th>Total Credits:</th>
+                <td><input type="number" x-model="newStudent.tot_cred" /></td>
+            </tr>
+            <tr>
+                <th>Department:</th>
+                <td>
+                    <select x-model="newStudent.dept_name">
+                        <template x-for="d in depts">
+                            <option :value="d.dept_name" x-text="d.dept_name"></option>
+                        </template>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button @click="saveStudent()">Save</button>
+                    <button @click="page = 1">Back</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div x-show="page === 5">
+    <h2>Remove a Student</h2>
+
+    <label for="dept-select">Select Department:</label>
+    <select x-model="selectedDeptForRemoval" @change="loadStudentsByDept()">
+        <option value="" selected>-- Select dept_name here --</option>
+        <template x-for="d in depts" :key="d.dept_name">
+            <option :value="d.dept_name" x-text="d.dept_name"></option>
+        </template>
+    </select>
+
+    <div x-show="studentsToRemove.length > 0" style="margin-top: 1em;">
+            <h3>Students in <span x-text="selectedDeptForRemoval"></span></h3>
+            <ul>
+                <template x-for="s in studentsToRemove">
+                    <li>
+                        <a href="#" 
+                        @click="selectStudentToRemove(s)"
+                        :style="{ fontWeight: selectedStudent?.id === s.id ? 'bold' : 'normal', color: 'red' }">
+                            <span x-text="s.name + ' (' + s.id + ')'"></span>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
+        <div x-show="selectedStudent" style="margin-top: 1em;">
+            <p>Are you sure you want to remove this student?</p>
+            <button @click="confirmRemoveStudent()">Yes</button>
+            <button @click="page = 1">No</button>
+        </div>
+    </div>
+
+    
+</body> 
+
+</html>
