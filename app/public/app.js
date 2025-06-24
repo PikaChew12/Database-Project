@@ -11,6 +11,27 @@ function App() {
         selectedDeptForRemoval: '',
         studentsToRemove: [],
         electedStudent: null,
+        selectedDeptInfo: null,
+
+        async getDepartments() {
+            try {
+                const res = await fetch('/api/departments');
+                this.depts = await res.json();
+            } catch (err) {
+                console.error('Failed to fetch departments:', err);
+            }
+        },
+
+
+        async getDeptInfo(deptName) {
+            try {
+                const res = await fetch(`/api/depts/${deptName}`);
+                const data = await res.json();
+                this.selectedDeptInfo = data[0];
+            } catch (err) {
+                console.error("Failed to load department info:", err);
+            }
+        },
 
         openRemoveStudent() {
             this.page = 5;
@@ -58,18 +79,11 @@ function App() {
             this.newStudent = { id: '', name: '', tot_cred: '', dept_name: '' };
             this.page = 4;
 
-            // if depts aren't already loaded
-            if (this.depts.length === 0) {
-                fetch('/api/courses') // or a specific department endpoint
-                    .then(res => res.json())
-                    .then(data => {
-                        const set = new Set(data.map(c => c.dept_name));
-                        this.depts = [...set].map(name => ({ dept_name: name }));
-                    });
-            }
-            else {
-                this.newStudent.dept_name = "Biology";
-            }
+            fetch('/api/departments')
+                .then(res => res.json())
+                .then(data => {
+                    this.depts = data;
+                });
         },
 
         async saveStudent() {

@@ -43,7 +43,7 @@
     </style>
 </head>
 
-<body x-data="App()" x-init="getCourses(); getKpis()">
+<body x-data="App()" x-init="getCourses(); getKpis(); getDepartments();">
 
     <div class="col" x-show="Object.keys(kpis).length > 0 && page === 1">
         <h2>Course Dashboard</h2>
@@ -59,15 +59,31 @@
                 <td x-text="kpis.total_departments"></td>
             </tr>
             <tr>
-                <th>Average Credits:</th>
+                <th>Total Students:</th>
+                <td x-text="kpis.total_students"></td>
+            </tr>
+            <tr>
+                <th>Average Credits per Course:</th>
                 <td x-text="kpis.average_credits"></td>
+            </tr>
+            <tr>
+                <th>Average Credits per Student:</th>
+                <td x-text="kpis.avg_credits_per_student"></td>
             </tr>
             <tr>
                 <th>Most Enrolled Course:</th>
                 <td x-text="kpis.top_courses_by_enrollment[0]?.course_id + ' (' + kpis.top_courses_by_enrollment[0]?.student_count + ' students)'"></td>
             </tr>
             <tr>
-                <th>Top Department (by Budget):</th>
+                <th>Department Offering Most Courses:</th>
+                <td x-text="kpis.most_courses_dept?.dept_name + ' (' + kpis.most_courses_dept?.num_courses + ' courses)'"></td>
+            </tr>
+            <tr>
+                <th>Department with Most Students:</th>
+                <td x-text="kpis.most_students_dept?.dept_name + ' (' + kpis.most_students_dept?.student_count + ' students)'"></td>
+            </tr>
+            <tr>
+                <th>Top Department by Budget:</th>
                 <td x-text="kpis.top_departments_by_budget[0]?.dept_name + ' ($' + kpis.top_departments_by_budget[0]?.budget + ')'" ></td>
             </tr>
         </table>
@@ -95,26 +111,38 @@
                 </tr>
             </template>
         </table>
-        <!-- <pre x-text="JSON.stringify(courses, null, 4)"></pre> -->
     </div>
-    <div class="col" x-show="Object.keys(dept).length !== 0 && page === 1">
-        <h2>Departments</h2>
-        <table class="hdr">
-            <tr>
-                <th>Name : </th>
-                <td x-text="dept.dept_name"></td>
-            </tr>
-            <tr>
-                <th>Building : </th>
-                <td x-text="dept.building"></td>
-            </tr>
-            <tr>
-                <th>Budget : </th>
-                <td x-text="dept.budget"></td>
-            </tr>
-
-        </table>
-        <pre x-text="JSON.stringify(dept, null, 4)"></pre>
+        <div class="col" x-show="page === 1 && depts.length > 0">
+            <h2>Departments</h2>
+            <table>
+                <tr>
+                    <th>Dept. Name</th>
+                </tr>
+                <template x-for="d in depts" :key="d.dept_name">
+                    <tr>
+                        <td>
+                            <a href="#" x-text="d.dept_name" @click.prevent="getDeptInfo(d.dept_name)"></a>
+                        </td>
+                    </tr>
+                </template>
+            </table>
+        <div class="col" x-show="selectedDeptInfo">
+            <h3>Department Info</h3>
+            <table class="hdr">
+                <tr>
+                    <th>Name:</th>
+                    <td x-text="selectedDeptInfo.dept_name"></td>
+                </tr>
+                <tr>
+                    <th>Building:</th>
+                    <td x-text="selectedDeptInfo.building"></td>
+                </tr>
+                <tr>
+                    <th>Budget:</th>
+                    <td x-text="selectedDeptInfo.budget"></td>
+                </tr>
+            </table>
+        </div>
     </div>
     <div x-show="page === 2">
         <h2>Edit</h2>
@@ -196,7 +224,8 @@
                 <th>Department:</th>
                 <td>
                     <select x-model="newStudent.dept_name">
-                        <template x-for="d in depts">
+                        <option value="">-- Select department here --</option>
+                        <template x-for="d in depts" :key="d.dept_name">
                             <option :value="d.dept_name" x-text="d.dept_name"></option>
                         </template>
                     </select>

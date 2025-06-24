@@ -93,7 +93,9 @@ router.get('/kpis', async (req, res) => {
     try {
         const totalCourses = await db.query(`SELECT COUNT(*) FROM course`);
         const totalDepartments = await db.query(`SELECT COUNT(*) FROM department`);
+        const totalStudents = await db.query(`SELECT COUNT(*) AS total_students FROM student`);
         const avgCredits = await db.query(`SELECT ROUND(AVG(credits), 2) AS avg FROM course`);
+        const avgCredsPerStudent = await db.query(`SELECT ROUND(AVG(tot_cred), 2) AS avg FROM student`);
         const topCourseLoads = await db.query(`
             SELECT course_id, COUNT(*) AS student_count
             FROM takes
@@ -113,14 +115,33 @@ router.get('/kpis', async (req, res) => {
             GROUP BY dept_name
             ORDER BY num_courses DESC;
         `);
+        const mostCoursesDept = await db.query(`
+            SELECT dept_name, COUNT(*) AS num_courses
+            FROM course
+            GROUP BY dept_name
+            ORDER BY num_courses DESC
+            LIMIT 1;
+        `);
+        const mostStudentsDept = await db.query(`
+            SELECT c.dept_name, COUNT(DISTINCT t.id) AS student_count
+            FROM course c
+            JOIN takes t ON c.course_id = t.course_id
+            GROUP BY c.dept_name
+            ORDER BY student_count DESC
+            LIMIT 1;
+        `);
 
         res.json({
             total_courses: totalCourses.rows[0].count,
             total_departments: totalDepartments.rows[0].count,
+            total_students: totalStudents.rows[0].total_students,
             average_credits: avgCredits.rows[0].avg,
+            avg_credits_per_student: avgCredsPerStudent.rows[0].avg,
             top_courses_by_enrollment: topCourseLoads.rows,
             top_departments_by_budget: topDepts.rows,
-            course_distribution: coursesPerDept.rows
+            course_distribution: coursesPerDept.rows,
+            most_courses_dept: mostCoursesDept.rows[0],
+            most_students_dept: mostStudentsDept.rows[0]
         });
     } catch (err) {
         console.error(err);
