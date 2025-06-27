@@ -42,8 +42,7 @@
         }
     </style>
 </head>
-
-<body x-data="App()" x-init="getCourses(); getKpis(); getDepartments();">
+<body x-data="App()" x-init="getCourses(); getKpis(); getDepartments(); getInstructors(); getStudents();">
 
     <div class="col" x-show="Object.keys(kpis).length > 0 && page === 1">
         <h2>Course Dashboard</h2>
@@ -143,6 +142,36 @@
                 </tr>
             </table>
         </div>
+    </div>
+
+    <div class="col" x-show="instructors.length && page === 1">
+        <h2>Instructors</h2>
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Department</th><th>Salary</th></tr>
+            <template x-for="inst in instructors" :key="inst.id">
+                <tr>
+                    <td x-text="inst.id"></td>
+                    <td x-text="inst.name"></td>
+                    <td x-text="inst.dept_name"></td>
+                    <td x-text="inst.salary"></td>
+                </tr>
+            </template>
+        </table>
+    </div>
+
+    <div class="col" x-show="allstudents.length && page === 1">
+        <h2>Students</h2>
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Department</th><th>Total Credits</th></tr>
+            <template x-for="stu in allstudents" :key="stu.id">
+                <tr>
+                    <td x-text="stu.id"></td>
+                    <td x-text="stu.name"></td>
+                    <td x-text="stu.dept_name"></td>
+                    <td x-text="stu.tot_cred"></td>
+                </tr>
+            </template>
+        </table>
     </div>
     <div x-show="page === 2">
         <h2>Edit</h2>

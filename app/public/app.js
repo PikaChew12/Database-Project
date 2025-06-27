@@ -10,8 +10,22 @@ function App() {
         newStudent: { id: '', name: '', tot_cred: '', dept_name: '' },
         selectedDeptForRemoval: '',
         studentsToRemove: [],
-        electedStudent: null,
+        selectedStudent: null,
         selectedDeptInfo: null,
+        instructors: [],
+        allstudents: [],
+
+        async getInstructors() {
+            const instructors = await fetch('/api/instructors')
+                .then(res => res.json());
+            this.instructors = instructors;
+        },
+
+        async getStudents() {
+            const students = await fetch('/api/students')
+                .then(res => res.json());
+            this.allstudents = students;
+        },
 
         async getDepartments() {
             try {
@@ -142,7 +156,6 @@ function App() {
                 console.log(data);
                 this.courses = data;
                 this.page = 1;
-                //this.getCourses()
             });
         },
         async getStudentsByDept(dept_name) {

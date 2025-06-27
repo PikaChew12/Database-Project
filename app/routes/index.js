@@ -89,6 +89,23 @@ router.post('/students/save', async (req, res) => {
     }
 });
 
+router.get('/students', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM student');
+    res.status(200).json(rows);
+  } catch (err) {
+    res.status(500).send('Error fetching students: ' + err.message);
+  }
+});
+
+router.get('/instructors', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM instructor');
+    res.status(200).json(rows);
+  } catch (err) {
+    res.status(500).send('Error fetching instructors: ' + err.message);
+  }
+});
 router.get('/kpis', async (req, res) => {
     try {
         const totalCourses = await db.query(`SELECT COUNT(*) FROM course`);
