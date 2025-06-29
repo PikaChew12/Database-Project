@@ -184,6 +184,26 @@ router.post('/students/save', async (req, res) => {
 });
 
 /**
+ * POST /instructors/save
+ * Insert a new instructor record
+ */
+router.post('/instructors/save', async (req, res) => {
+  try {
+    const { id, name, dept_name, salary } = req.body;
+    const text = `
+      INSERT INTO instructor (id, name, dept_name, salary)
+      VALUES ($1, $2, $3, $4)
+    `;
+    await db.query(text, [id, name, dept_name, salary]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+
+/**
  * GET /kpis
  * Compute various KPIs across courses, departments, students, etc.
  */

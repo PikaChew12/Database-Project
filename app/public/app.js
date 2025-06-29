@@ -20,6 +20,12 @@ function App() {
         selectedDeptInfo: null,               // Full info for a single department detail view
         instructors: [],                      // List of all instructors
         allstudents: [],                      // Full list of students (for standalone Students table)
+        newInstructor: {
+            id: '',
+            name: '',
+            dept_name: '',
+            salary: ''
+        },
 
         // ===== Data Fetching Methods =====
 
@@ -141,6 +147,35 @@ function App() {
             } catch (err) {
                 alert("Error: " + err.message);
             }
+        },
+
+        openAddInstructor() {
+        this.newInstructor = { id: '', name: '', dept_name: '', salary: '' };
+        this.page = 6;
+
+        // Ensure departments are loaded
+        if (this.depts.length === 0) {
+            fetch('/api/departments')
+            .then(res => res.json())
+            .then(data => this.depts = data);
+        }
+        },
+
+        async saveInstructor() {
+        try {
+            const res = await fetch('/api/instructors/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newInstructor)
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+
+            this.page = 1;
+            this.getInstructors(); // Refresh instructor table
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
         },
 
         // ===== Dashboard Data Methods =====

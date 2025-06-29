@@ -171,6 +171,7 @@
         <h2>Course Dashboard</h2>
         <button @click="openAddStudent()">Add a Student</button>
         <button @click="openRemoveStudent()">Remove a Student</button>
+        <button @click="openAddInstructor()">Add an Instructor</button>
         <table class="hdr">
             <tr>
                 <th>Total Courses:</th>
@@ -418,6 +419,41 @@
             <button @click="confirmRemoveStudent()">Yes</button>
             <button @click="page = 1">No</button>
         </div>
+    </div>
+
+    <div x-show="page === 6">
+    <h2>Add a New Instructor</h2>
+    <table class="hdr">
+        <tr>
+        <th>ID:</th>
+        <td><input type="text" x-model="newInstructor.id" /></td>
+        </tr>
+        <tr>
+        <th>Name:</th>
+        <td><input type="text" x-model="newInstructor.name" /></td>
+        </tr>
+        <tr>
+        <th>Salary:</th>
+        <td><input type="number" x-model="newInstructor.salary" /></td>
+        </tr>
+        <tr>
+        <th>Department:</th>
+        <td>
+            <select x-model="newInstructor.dept_name">
+            <option value="">-- Select department here --</option>
+            <template x-for="d in depts" :key="d.dept_name">
+                <option :value="d.dept_name" x-text="d.dept_name"></option>
+            </template>
+            </select>
+        </td>
+        </tr>
+        <tr>
+        <td colspan="2">
+            <button @click="saveInstructor()">Save</button>
+            <button @click="page = 1">Back</button>
+        </td>
+        </tr>
+    </table>
     </div>
 
     
