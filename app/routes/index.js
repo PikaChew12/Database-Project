@@ -206,15 +206,6 @@ router.get('/kpis', async (req, res) => {
       `SELECT ROUND(AVG(tot_cred), 2) AS avg FROM student`
     );
 
-    // Top 5 courses by enrollment
-    const topCourses = await db.query(`
-      SELECT course_id, COUNT(*) AS student_count
-      FROM takes
-      GROUP BY course_id
-      ORDER BY student_count DESC
-      LIMIT 5;
-    `);
-
     // Top 5 departments by budget
     const topDepts = await db.query(`
       SELECT dept_name, budget
@@ -256,7 +247,6 @@ router.get('/kpis', async (req, res) => {
       total_students: totalStudents.rows[0].total_students,
       average_credits: avgCredits.rows[0].avg,
       avg_credits_per_student: avgCredsPerStudent.rows[0].avg,
-      top_courses_by_enrollment: topCourses.rows,
       top_departments_by_budget: topDepts.rows,
       course_distribution: coursesPerDept.rows,
       most_courses_dept: mostCoursesDept.rows[0],
