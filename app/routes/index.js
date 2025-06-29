@@ -222,6 +222,26 @@ router.post('/departments/save', async (req, res) => {
 });
 
 /**
+ * POST /courses/new
+ * Insert a new course record
+ */
+router.post('/courses/new', async (req, res) => {
+  try {
+    const { course_id, title, dept_name, credits } = req.body;
+    const text = `
+      INSERT INTO course
+        (course_id, title, dept_name, credits)
+      VALUES ($1, $2, $3, $4)
+    `;
+    await db.query(text, [course_id, title, dept_name, credits]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+/**
  * GET /kpis
  * Compute various KPIs across courses, departments, students, etc.
  */

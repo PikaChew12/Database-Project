@@ -173,6 +173,7 @@
         <button @click="openRemoveStudent()">Remove a Student</button>
         <button @click="openAddInstructor()">Add an Instructor</button>
         <button @click="openAddDepartment()">Add a Department</button>
+        <button @click="openAddCourse()">Add a Course</button>
         <table class="hdr">
             <tr>
                 <th>Total Courses:</th>
@@ -474,6 +475,42 @@
             <tr>
                 <td colspan="2">
                     <button @click="saveDepartment()">Save</button>
+                    <button @click="page = 1">Back</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div x-show="page === 8">
+        <h2>Add a New Course</h2>
+        <table class="hdr">
+            <tr>
+                <th>Course ID:</th>
+                <td>
+                    <input type="text" x-model="newCourse.course_id" placeholder="e.g. CS-104"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Title:</th>
+                <td><input type="text" x-model="newCourse.title" /></td>
+            </tr>
+            <tr>
+                <th>Department:</th>
+                <td>
+                    <select x-model="newCourse.dept_name">
+                        <option value="">-- Select department here --</option>
+                        <template x-for="d in depts" :key="d.dept_name">
+                            <option :value="d.dept_name" x-text="d.dept_name"></option>
+                        </template>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Credits:</th>
+                <td><input type="number" x-model="newCourse.credits" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button @click="saveCourse()">Save</button>
                     <button @click="page = 1">Back</button>
                 </td>
             </tr>

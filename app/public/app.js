@@ -27,10 +27,16 @@ function App() {
             salary: ''
         },
         newDepartment: {
-        dept_name: '',
-        building: '',
-        budget: ''
+            dept_name: '',
+            building: '',
+            budget: ''
         },
+        newCourse: {
+            course_id: '',
+            title: '',
+            dept_name: '',
+            credits: ''
+    },
 
         // ===== Data Fetching Methods =====
 
@@ -202,6 +208,40 @@ function App() {
             this.page = 1;
         } catch (err) {
             alert('Error: ' + err.message);
+            }
+        },
+
+        /** Open “Add Course” page and reset form */
+        openAddCourse() {
+            this.newCourse = { course_id: '', title: '', dept_name: '', credits: '' };
+            this.page = 8;
+
+            // Ensure department list is loaded
+            if (this.depts.length === 0) {
+                fetch('/api/departments')
+                    .then(res => res.json())
+                    .then(data => {
+                        this.depts = data;
+                    });
+            }
+        },
+
+
+        /** POST a new course record */
+        async saveCourse() {
+            try {
+                const res = await fetch('/api/courses/new', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.newCourse)
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+
+                this.page = 1;
+                this.getCourses(); // Refresh dashboard
+            } catch (err) {
+                alert("Error: " + err.message);
             }
         },
 
