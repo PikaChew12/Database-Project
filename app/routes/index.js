@@ -202,6 +202,24 @@ router.post('/instructors/save', async (req, res) => {
   }
 });
 
+/**
+ * POST /departments/save
+ * Insert a new department record
+ */
+router.post('/departments/save', async (req, res) => {
+  try {
+    const { dept_name, building, budget } = req.body;
+    await db.query(`
+      INSERT INTO department (dept_name, building, budget)
+      VALUES ($1, $2, $3)
+    `, [dept_name, building, budget]);
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
 
 /**
  * GET /kpis

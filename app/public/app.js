@@ -26,6 +26,11 @@ function App() {
             dept_name: '',
             salary: ''
         },
+        newDepartment: {
+        dept_name: '',
+        building: '',
+        budget: ''
+        },
 
         // ===== Data Fetching Methods =====
 
@@ -176,6 +181,28 @@ function App() {
         } catch (err) {
             alert("Error: " + err.message);
         }
+        },
+
+        openAddDepartment() {
+        this.newDepartment = { dept_name: '', building: '', budget: '' };
+        this.page = 7;
+        },
+
+        async saveDepartment() {
+        try {
+            const res = await fetch('/api/departments/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newDepartment)
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+
+            await this.getDepartments();
+            this.page = 1;
+        } catch (err) {
+            alert('Error: ' + err.message);
+            }
         },
 
         // ===== Dashboard Data Methods =====

@@ -172,6 +172,7 @@
         <button @click="openAddStudent()">Add a Student</button>
         <button @click="openRemoveStudent()">Remove a Student</button>
         <button @click="openAddInstructor()">Add an Instructor</button>
+        <button @click="openAddDepartment()">Add a Department</button>
         <table class="hdr">
             <tr>
                 <th>Total Courses:</th>
@@ -455,6 +456,30 @@
         </tr>
     </table>
     </div>
+    <div x-show="page === 7">
+        <h2>Add a New Department</h2>
+        <table class="hdr">
+            <tr>
+                <th>Name:</th>
+                <td><input type="text" x-model="newDepartment.dept_name" /></td>
+            </tr>
+            <tr>
+                <th>Building:</th>
+                <td><input type="text" x-model="newDepartment.building" /></td>
+            </tr>
+            <tr>
+                <th>Budget:</th>
+                <td><input type="number" x-model="newDepartment.budget" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button @click="saveDepartment()">Save</button>
+                    <button @click="page = 1">Back</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 
     
 </body> 
