@@ -27,7 +27,6 @@
         }
 
         body {
-            /* font-family: 'Inter', sans-serif; */
             font-family: "Montserrat", sans-serif;
             font-size: medium;
             font-weight: 400;
@@ -44,7 +43,6 @@
             font-family: "Montserrat", sans-serif;
             font-size: xx-large;
             font-weight: bold;
-            /* font-size: 1.2rem; */
         }
 
         table {
@@ -172,6 +170,9 @@
         <button @click="openAddInstructor()">Add an Instructor</button>
         <button @click="openAddDepartment()">Add a Department</button>
         <button @click="openAddCourse()">Add a Course</button>
+        <button @click="getGrades()">View Grades</button>
+        <button @click="getGradesGpa()">View GPA Table</button>
+
         <table class="hdr">
             <tr>
                 <th>Total Courses:</th>
@@ -514,6 +515,58 @@
             </tr>
         </table>
     </div>
+    <!-- page === 9 : all student grades -->
+    <div class="col" x-show="page === 9">
+        <h2>Student Grades</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Year</th>
+                <th>Grade</th>
+            </tr>
+            <template x-for="g in grades" :key="`${g.id}-${g.course_id}-${g.year}-${g.semester}`">
+                <tr>
+                    <td x-text="g.id"></td>
+                    <td x-text="g.name"></td>
+                    <td x-text="g.course_id"></td>
+                    <td x-text="g.semester"></td>
+                    <td x-text="g.year"></td>
+                    <td x-text="g.grade"></td>
+                </tr>
+            </template>
+        </table>
+        <button @click="page = 1">Back</button>
+    </div>
+
+        <!-- page === 10 : GPA table -->
+        <div class="col" x-show="page === 10">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Name</th><th>Course ID</th><th>Grade</th><th>GPA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(gg, idx) in gradesGpa" :key="idx">
+                  <tr>
+                    <td x-text="gg.id"></td>
+                    <td x-text="gg.name"></td>
+                    <td x-text="gg.course_id"></td>
+                    <td x-text="gg.grade"></td>
+                    <td x-text="gg.gpa"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          
+            <button @click="page = 1">Back</button>
+          </div>
+          
+
+
 
 
     

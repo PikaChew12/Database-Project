@@ -242,6 +242,68 @@ router.post('/courses/new', async (req, res) => {
 });
 
 /**
+ * GET /grades
+ * Return every student’s grades (with course, term & year)
+ */
+router.get('/grades', async (req, res) => {
+  try {
+    const text = `
+      SELECT  s.id,
+              s.name,
+              t.course_id,
+              t.semester,
+              t.year,
+              t.grade
+      FROM    student  AS s
+      JOIN    takes    AS t  ON s.id = t.id
+      ORDER BY t.year DESC,           -- most recent first
+               t.semester,            -- Fall / Spring
+               s.id,
+               t.course_id;
+    `;
+    const { rows } = await db.query(text);
+    res.status(200).json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/**
+ * GET /grades-gpa
+ * Return student id, name, letter grade and GPA
+ */
+router.get('/gradesgpa', async (req, res) => {
+  try {
+    const text = `
+      SELECT  s.id,
+              s.name,
+              t.course_id,
+              t.grade,
+              CASE t.grade
+                  WHEN 'A+' THEN 4.00
+                  WHEN 'A'  THEN 3.75
+                  WHEN 'A-' THEN 3.50
+                  WHEN 'B+' THEN 3.25
+                  WHEN 'B'  THEN 3.00
+                  WHEN 'B-' THEN 2.75
+                  WHEN 'C+' THEN 2.50
+                  WHEN 'C'  THEN 2.00
+                  WHEN 'C-' THEN 1.50
+                  ELSE 0.00          -- D / F / null → 0
+              END AS gpa
+      FROM    student AS s
+      JOIN    takes   AS t ON t.id = s.id
+      ORDER BY s.id, t.grade;
+    `;
+    const { rows } = await db.query(text);
+    res.status(200).json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
+/**
  * GET /kpis
  * Compute various KPIs across courses, departments, students, etc.
  */

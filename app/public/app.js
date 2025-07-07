@@ -37,8 +37,24 @@ function App() {
             dept_name: '',
             credits: ''
     },
+    grades: [],                 // list returned by /api/grades
+    gradesGpa: [],              // list from /api/grades-gpa
+
 
         // ===== Data Fetching Methods =====
+
+        /** Fetch GPA list and open the view */
+        async getGradesGpa() {
+            this.gradesGpa = await fetch('/api/gradesgpa').then(r => r.json());
+            this.page = 10;     // new view
+        },
+
+        /** Fetch and show all grades */
+        async getGrades() {
+            const data = await fetch('/api/grades').then(r => r.json());
+            this.grades = data;
+            this.page  = 9;          // switch to the new view
+        },
 
         /** Fetch and store all instructors */
         async getInstructors() {
